@@ -14,6 +14,12 @@ from transformers import (
 from sklearn.metrics import accuracy_score, classification_report
 import wandb
 
+# Force use of specific GPU and disable distributed training
+os.environ["CUDA_VISIBLE_DEVICES"] = "7"  # Use GPU 7 (free)
+os.environ["WORLD_SIZE"] = "1"  # Single GPU only
+os.environ["RANK"] = "0"
+os.environ["LOCAL_RANK"] = "0"
+
 # ============================================
 # 0. SETUP DIRECTORIES AND WANDB
 # ============================================
@@ -185,10 +191,19 @@ print("="*60)
 max_input_length = 512
 
 def extract_citation_context(text):
-    """Extract just the citation context, removing task instructions"""
+    """Extract just the citation context, removing task instructions and labels"""
     if "Section Title:" in text:
         # Extract from section title onwards (removes instructions at top)
-        return text.split("Section Title:")[1].strip()
+        content = text.split("Section Title:")[1].strip()
+
+        # Remove labels - just keep the content
+        content = content.replace("Context before the citation:", " [BEFORE] ")
+        content = content.replace("Citation Sentence:", " [CITATION] ")
+        content = content.replace("Context after the citation:", " [AFTER] ")
+
+        # Clean up extra whitespace
+        content = " ".join(content.split())
+        return content
     else:
         # Fallback: return as is
         return text
