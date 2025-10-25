@@ -14,9 +14,6 @@ from transformers import (
 from sklearn.metrics import accuracy_score, classification_report
 import wandb
 
-# Force use of specific GPU (GPU 7 is free based on nvidia-smi)
-os.environ["CUDA_VISIBLE_DEVICES"] = "7"
-
 # ============================================
 # 0. SETUP DIRECTORIES AND WANDB
 # ============================================
@@ -96,8 +93,8 @@ def sample_dataset(dataset_split, sample_ratio=0.01):
     )
     return dataset_split.select(sampled_indices)
 
-sampled_train = sample_dataset(filtered_train, 1.0)
-sampled_val = sample_dataset(filtered_val, 1.0)
+sampled_train = sample_dataset(filtered_train, SAMPLE_RATIO)
+sampled_val = sample_dataset(filtered_val, SAMPLE_RATIO)
 
 print(f"\nSampled train: {len(sampled_train)}")
 print(f"Sampled val: {len(sampled_val)}")
@@ -189,20 +186,15 @@ max_input_length = 512
 
 def extract_citation_context(text):
     """Extract just the citation context, removing task instructions"""
-    # Find where the actual content starts (after instructions)
     if "Section Title:" in text:
-        # Extract from section title onwards
+        # Extract from section title onwards (removes instructions at top)
         return text.split("Section Title:")[1].strip()
-    elif "Context before the citation:" in text:
-        # Extract from context onwards
-        return text.split("Context before the citation:")[0].split("\n\n")[-1] + "\n" + \
-               text.split("Context before the citation:")[1]
     else:
-        # If no clear markers, return as is
+        # Fallback: return as is
         return text
 
 def preprocess_function(examples):
-    # Extract just citation context (remove task instructions)
+    # Remove task instructions, keep only citation context
     cleaned_inputs = [extract_citation_context(inp) for inp in examples['input']]
 
     # Tokenize inputs
