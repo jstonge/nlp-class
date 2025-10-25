@@ -28,9 +28,9 @@ Path(OUTPUT_DIR).mkdir(exist_ok=True)
 # Initialize Weights & Biases
 wandb.init(
     project="citation-intent-classification",
-    name="roberta-citation-intent",
+    name="roberta-large-citation-intent",
     config={
-        "model_name": "roberta-base",
+        "model_name": "roberta-large",
         "dataset": "allenai/SciRIFF",
         "task": "citation_intent_classification",
         "learning_rate": 2e-5,
@@ -144,7 +144,7 @@ print("\n" + "="*60)
 print("LOADING MODEL")
 print("="*60)
 
-model_name = "roberta-base"  # Better for classification on V100
+model_name = "roberta-large"  # Larger model for better performance
 print(f"Model: {model_name}")
 
 tokenizer = AutoTokenizer.from_pretrained(model_name)
