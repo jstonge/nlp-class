@@ -212,17 +212,19 @@ print("TRAINING CONFIGURATION")
 print("="*60)
 
 if USE_GPU:
-    batch_size = 16
-    eval_batch_size = 32
+    batch_size = 8  # Reduced for roberta-large
+    eval_batch_size = 16
     num_epochs = 3
     use_fp16 = True
     logging_steps = 50
+    gradient_accumulation = 2  # Effective batch size = 16
 else:
-    batch_size = 8
-    eval_batch_size = 16
+    batch_size = 4
+    eval_batch_size = 8
     num_epochs = 2
     use_fp16 = False
     logging_steps = 100
+    gradient_accumulation = 1
 
 # Compute metrics function
 def compute_metrics(eval_pred):
@@ -246,6 +248,7 @@ training_args = TrainingArguments(
     save_total_limit=2,
     report_to='wandb',
     fp16=use_fp16,
+    gradient_accumulation_steps=gradient_accumulation,
 )
 
 print(f"Device: {device}")
