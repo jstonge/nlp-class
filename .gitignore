@@ -12,3 +12,4 @@ model_cache/
 wandb/
 results/
 output/
+slurm-*

@@ -16,9 +16,6 @@ import wandb
 
 # Force use of specific GPU and disable distributed training
 os.environ["CUDA_VISIBLE_DEVICES"] = "7"  # Use GPU 7 (free)
-os.environ["WORLD_SIZE"] = "1"  # Single GPU only
-os.environ["RANK"] = "0"
-os.environ["LOCAL_RANK"] = "0"
 
 # ============================================
 # 0. SETUP DIRECTORIES AND WANDB
